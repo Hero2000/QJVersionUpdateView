@@ -8,6 +8,8 @@
 
 #import "QJCheckVersionUpdate.h"
 #import "QJVersionUpdateVIew.h"
+
+#define GetUserDefaut [[NSUserDefaults standardUserDefaults] objectForKey:@"VersionUpdateNotice"]
 #define OLDVERSION [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
 #define APPID  @"111111111"
 
@@ -22,13 +24,19 @@
  */
 + (void)CheckVerion:(UpdateBlock)updateblock
 {
-    NSString *currentAppStoreVersion = @"2.0.0";
-    NSString *describeStr = @"1.修正了部分单词页面空白的问题修正了部分单词页面空白的问题\n2.修正了部分单词页面空白的问题修正了部分单词页面空白的问题\n3.修正了部分单词页面空白的问题\n4.修正了部分单词页面空白的问题修正了部分单词页面空白的问题";
-    NSArray *dataArr = [QJCheckVersionUpdate separateToRow:describeStr];
-    if (updateblock) {
-        updateblock(currentAppStoreVersion,dataArr);
+    NSString *currentAppStoreVersion = @"5.0.0";
+    if ([QJCheckVersionUpdate versionlessthan:[GetUserDefaut isKindOfClass:[NSString class]] && GetUserDefaut ? GetUserDefaut : OLDVERSION Newer:currentAppStoreVersion])
+    {
+        NSLog(@"暂不更新");
+    }else{
+        NSLog(@"请到appstore更新%@版本",currentAppStoreVersion);
+         NSString *describeStr = @"1.修正了部分单词页面空白的问题修正了部分单词页面空白的问题\n2.修正了部分单词页面空白的问题去够呛够呛\n3.修正了部分单词页面空白的问题";
+        NSLog(@"修复问题描述:%@",describeStr);
+        NSArray *dataArr = [QJCheckVersionUpdate separateToRow:describeStr];
+        if (updateblock) {
+            updateblock(currentAppStoreVersion,dataArr);
+        }
     }
-
 }
 
 /**
@@ -58,11 +66,11 @@
 //                } else {
 //                    NSString *currentAppStoreVersion = [versionsInAppStore objectAtIndex:0];
 //                    NSLog(@"%@",OLDVERSION);
-//                    if ([QJCheckVersionUpdate versionlessthan:currentAppStoreVersion])
+//                    if ([QJCheckVersionUpdate versionlessthan:[GetUserDefaut isKindOfClass:[NSString class]] && GetUserDefaut ? GetUserDefaut : OLDVERSION Newer:currentAppStoreVersion])
 //                    {
-//                        NSLog(@"当前已经是最新版本");
+//                        NSLog(@"暂不更新");
 //                    }else{
-//                        NSLog(@"请到appstore更新版本");
+//                        NSLog(@"请到appstore更新%@版本",currentAppStoreVersion);
 //                        /**
 //                         *  修复问题描述
 //                         */
@@ -82,12 +90,12 @@
 //}
 
 
-+ (BOOL)versionlessthan:(NSString *)newver
++ (BOOL)versionlessthan:(NSString *)oldOne Newer:(NSString *)newver
 {
-    if ([OLDVERSION isEqualToString:newver]) {
+    if ([oldOne isEqualToString:newver]) {
         return YES;
     }else{
-        if ([OLDVERSION compare:newver options:NSNumericSearch] == NSOrderedDescending)
+        if ([oldOne compare:newver options:NSNumericSearch] == NSOrderedDescending)
         {
             return YES;
         }else{
@@ -116,6 +124,7 @@
             versionUpdateView.removeUpdateViewBlock = ^{
                 [weakself removeVersionUpdateView];
             };
+            [[NSUserDefaults standardUserDefaults] setObject:str forKey:@"VersionUpdateNotice"];
         }
     }];
 }
